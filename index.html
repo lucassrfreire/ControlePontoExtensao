@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Controle de Ponto</title>
+<style>
+  :root {
+    color-scheme: light dark;
+  }
+  body {
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    max-width: 420px;
+    margin: 40px auto;
+    padding: 0 20px;
+    text-align: center;
+  }
+  h1 {
+    font-size: 1.4rem;
+    margin-bottom: 4px;
+  }
+  #dataPicker {
+    font-size: 1rem;
+    padding: 8px;
+    margin: 16px 0 24px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .botoes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  button {
+    font-size: 1rem;
+    padding: 18px 8px;
+    border: none;
+    border-radius: 10px;
+    background: #2563eb;
+    color: white;
+    cursor: pointer;
+  }
+  button:active {
+    background: #1d4ed8;
+  }
+  button:disabled {
+    background: #93a3b8;
+    cursor: default;
+  }
+  #status {
+    margin-top: 20px;
+    min-height: 24px;
+    font-size: 0.95rem;
+    color: #444;
+  }
+  #status.erro {
+    color: #b91c1c;
+  }
+  #configAviso {
+    margin-top: 30px;
+    font-size: 0.8rem;
+    color: #b91c1c;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<h1>Controle de Ponto</h1>
+<p>Selecione a data e registre o horário.</p>
+
+<input type="date" id="dataPicker">
+
+<div class="botoes">
+  <button type="button" onclick="registrar('entrada')">Entrada</button>
+  <button type="button" onclick="registrar('saida_almoco')">Saída Almoço</button>
+  <button type="button" onclick="registrar('volta_almoco')">Volta Almoço</button>
+  <button type="button" onclick="registrar('saida')">Saída</button>
+</div>
+
+<div id="status"></div>
+<div id="configAviso">
+  Configure a URL do Web App em index.html (variável WEB_APP_URL) antes de usar.
+</div>
+
+<script src="config.js"></script>
+<script>
+  // A URL do Web App fica em config.js (fora do git). Veja SETUP.md.
+  const WEB_APP_URL = window.WEB_APP_URL || '';
+
+  const dataPicker = document.getElementById('dataPicker');
+  const status = document.getElementById('status');
+  const botoes = document.querySelectorAll('.botoes button');
+
+  const nomes = {
+    entrada: 'Entrada',
+    saida_almoco: 'Saída Almoço',
+    volta_almoco: 'Volta Almoço',
+    saida: 'Saída'
+  };
+
+  let enviando = false;
+
+  function hojeISO() {
+    const d = new Date();
+    const offset = d.getTimezoneOffset();
+    const local = new Date(d.getTime() - offset * 60000);
+    return local.toISOString().slice(0, 10);
+  }
+
+  dataPicker.value = hojeISO();
+
+  if (!WEB_APP_URL || WEB_APP_URL.indexOf('COLE_AQUI') !== -1) {
+    document.getElementById('configAviso').style.display = 'block';
+    botoes.forEach(b => b.disabled = true);
+  }
+
+  function registrar(tipo) {
+    if (enviando) return;
+
+    status.className = '';
+    status.textContent = 'Enviando ' + nomes[tipo] + '...';
+    botoes.forEach(b => b.disabled = true);
+    enviando = true;
+
+    const body = new URLSearchParams({ data: dataPicker.value, tipo: tipo });
+
+    fetch(WEB_APP_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: body.toString()
+    }).then(function () {
+      const agora = new Date().toLocaleTimeString('pt-BR');
+      status.className = '';
+      status.textContent = 'Registrado ' + nomes[tipo] + ' às ' + agora + ' (' + dataPicker.value + ')';
+    }).catch(function () {
+      status.className = 'erro';
+      status.textContent = 'Falha ao enviar. Verifique sua conexão e a URL configurada.';
+    }).finally(function () {
+      enviando = false;
+      botoes.forEach(b => b.disabled = false);
+    });
+  }
+</script>
+
+</body>
+</html>

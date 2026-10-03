@@ -1,0 +1,492 @@
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  --dark: #2f3237;
+  --dark-hover: #24272b;
+  --dark-soft: #3b3f45;
+  --surface: #f4f5f6;
+  --surface-hover: #eceef0;
+  --border: #e3e5e8;
+  --text-main: #1f2328;
+  --text-muted: #6b7178;
+  --text-faint: #b7bcc2;
+  --green: #22a06b;
+  --green-strong: #15803d;
+  --green-surface: #f0fdf4;
+  --green-border: #c6ecd4;
+  --red: #c62828;
+  --red-surface: #fdf1f1;
+  --red-border: #f5d0d0;
+}
+
+/* O Chrome limita o popup a 600px de altura; o layout é dimensionado para
+   caber nisso sem barra de rolagem (exceto com as configurações abertas). */
+body {
+  width: 380px;
+  margin: 0;
+  font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 12.5px;
+  color: var(--text-main);
+  background: var(--dark);
+}
+
+svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex-shrink: 0;
+}
+
+h2 {
+  font-size: 13.5px;
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+
+/* Header */
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 12px 18px;
+  color: #fff;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background: #fff;
+  color: var(--dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.brand-icon svg {
+  width: 20px;
+  height: 20px;
+  stroke-width: 2.2;
+}
+
+.brand-text h1 {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.brand-subtitle {
+  font-size: 11px;
+  color: #c9ccd1;
+}
+
+.header-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.icon-button {
+  width: 30px;
+  height: 30px;
+  background: var(--dark-soft);
+  border: none;
+  color: #fff;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-button:hover {
+  background: #474c53;
+}
+
+.icon-button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* Conteúdo */
+.content {
+  background: #fff;
+  border-radius: 14px 14px 0 0;
+  margin-top: -12px;
+  padding: 8px 8px 2px;
+}
+
+.card {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 10px;
+  margin-bottom: 5px;
+  background: #fff;
+}
+
+.card-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.card-heading h2 {
+  margin: 0;
+}
+
+.pill {
+  background: var(--surface);
+  color: var(--text-main);
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Saldo */
+.saldo-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 12px 7px;
+  margin-bottom: 5px;
+}
+
+.saldo-card.negativo {
+  background: var(--red-surface);
+  border-color: var(--red-border);
+}
+
+.saldo-card.positivo {
+  background: var(--green-surface);
+  border-color: var(--green-border);
+}
+
+.today-chip {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #fff;
+  border-radius: 7px;
+  padding: 4px 7px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.today-chip svg {
+  width: 13px;
+  height: 13px;
+}
+
+.today-chip div {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+
+.today-label {
+  font-size: 9px;
+  color: var(--text-muted);
+}
+
+.today-date {
+  font-size: 10.5px;
+  font-variant-numeric: tabular-nums;
+}
+
+.saldo-label {
+  font-size: 10.5px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.saldo-value {
+  font-size: 30px;
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--text-main);
+  font-variant-numeric: tabular-nums;
+}
+
+.saldo-card.negativo .saldo-value {
+  color: var(--red);
+}
+
+.saldo-card.positivo .saldo-value {
+  color: var(--green-strong);
+}
+
+.saldo-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* Registrar agora */
+.quick-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+}
+
+.quick-button {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 5px 8px;
+  cursor: pointer;
+  font-family: inherit;
+  color: var(--text-main);
+  text-align: left;
+}
+
+.quick-button:hover {
+  background: var(--surface-hover);
+}
+
+.quick-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  background: #e9ebed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.quick-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.quick-label {
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.quick-time {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.quick-button.done,
+.quick-button.next {
+  background: var(--dark);
+  border-color: var(--dark);
+  color: #fff;
+}
+
+.quick-button.done:hover,
+.quick-button.next:hover {
+  background: var(--dark-hover);
+}
+
+.quick-button.done .quick-icon,
+.quick-button.next .quick-icon {
+  background: var(--dark-soft);
+}
+
+.quick-button.done .quick-time,
+.quick-button.next .quick-time {
+  color: #d5d8dc;
+}
+
+.quick-button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* Lançamento manual */
+label {
+  display: block;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin: 6px 0 2px;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 5px 8px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  font-size: 12.5px;
+  font-family: inherit;
+  background: #fff;
+  color: var(--text-main);
+}
+
+input:focus,
+select:focus {
+  outline: none;
+  border-color: var(--dark);
+}
+
+.manual-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.85fr 1.15fr;
+  gap: 6px;
+}
+
+.manual-grid label {
+  white-space: nowrap;
+}
+
+.manual-grid label {
+  margin-top: 0;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.primary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: var(--dark);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.primary-button:hover {
+  background: var(--dark-hover);
+}
+
+.primary-button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.primary-button.full {
+  width: 100%;
+  margin-top: 8px;
+  padding: 7px 12px;
+  font-size: 13px;
+}
+
+.secondary-button {
+  background: #fff;
+  color: var(--text-main);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 12.5px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.secondary-button:hover {
+  background: var(--surface);
+}
+
+/* Registros do dia */
+.day-list {
+  list-style: none;
+  margin: 0;
+  padding: 0 2px;
+}
+
+.day-list li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 3px 2px;
+  border-bottom: 1px solid #eef0f2;
+}
+
+.day-list li:last-child {
+  border-bottom: none;
+}
+
+.day-icon {
+  display: flex;
+  color: var(--text-main);
+}
+
+.day-icon.registrado {
+  color: var(--green);
+}
+
+.day-label {
+  flex: 1;
+}
+
+.day-time {
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.day-time.vazio {
+  color: var(--text-faint);
+  font-weight: 400;
+}
+
+.day-footer {
+  margin: 4px 2px 0;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.day-footer.negativo {
+  color: var(--red);
+}
+
+/* Status */
+/* Fixo por cima do conteúdo, para a mensagem não aumentar a altura do popup. */
+.status {
+  position: fixed;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+  padding: 7px 9px;
+  border-radius: 7px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+  background: var(--dark);
+  color: #fff;
+  text-align: center;
+  font-size: 12px;
+}
+
+.status.status-error {
+  background: #ffebe9;
+  color: #a40e26;
+}

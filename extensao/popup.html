@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Controle de Ponto</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">
+      <span class="brand-icon">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>
+      </span>
+      <div class="brand-text">
+        <h1>Controle de Ponto</h1>
+        <span class="brand-subtitle">Seu tempo, organizado</span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button id="refresh-button" class="icon-button" type="button" title="Atualizar">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><polyline points="21 3 21 9 15 9"/></svg>
+      </button>
+      <button id="settings-button" class="icon-button" type="button" title="Configurações">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="content">
+    <section id="settings" class="card" hidden>
+      <h2>Configurações</h2>
+      <label for="url-input">URL do Web App (Apps Script)</label>
+      <input id="url-input" type="url" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off" />
+      <div class="form-actions">
+        <button id="settings-cancel" class="secondary-button" type="button">Cancelar</button>
+        <button id="settings-save" class="primary-button" type="button">Salvar</button>
+      </div>
+    </section>
+
+    <section class="saldo-card">
+      <div class="today-chip">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <div>
+          <span class="today-label">Hoje</span>
+          <span id="today-date" class="today-date"></span>
+        </div>
+      </div>
+      <span class="saldo-label">Saldo acumulado</span>
+      <strong id="saldo-value" class="saldo-value">--:--</strong>
+      <span id="saldo-hint" class="saldo-hint">Carregando...</span>
+    </section>
+
+    <section class="card">
+      <div class="card-heading">
+        <h2>Registrar agora</h2>
+        <span id="clock" class="pill">--:--</span>
+      </div>
+      <div id="quick-grid" class="quick-grid"></div>
+    </section>
+
+    <section class="card">
+      <h2>Lançamento manual</h2>
+      <div class="manual-grid">
+        <div>
+          <label for="manual-date">Dia</label>
+          <input id="manual-date" type="date" />
+        </div>
+        <div>
+          <label for="manual-time">Horário</label>
+          <input id="manual-time" type="time" />
+        </div>
+        <div>
+          <label for="manual-tipo">Tipo de lançamento</label>
+          <select id="manual-tipo"></select>
+        </div>
+      </div>
+      <button id="manual-submit" class="primary-button full" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Lançar
+      </button>
+    </section>
+
+    <section class="card">
+      <div class="card-heading">
+        <h2 id="day-title">Registros de hoje</h2>
+        <span id="day-total" class="pill" hidden></span>
+      </div>
+      <ul id="day-list" class="day-list"></ul>
+      <p id="day-footer" class="day-footer" hidden></p>
+    </section>
+
+    <div id="status" class="status" hidden></div>
+  </main>
+
+  <script src="api.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

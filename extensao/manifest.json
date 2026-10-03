@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "Controle de Ponto",
+  "version": "1.0.0",
+  "description": "Registre seus pontos e acompanhe o saldo do banco de horas direto na sua planilha Google Sheets.",
+  "permissions": ["storage"],
+  "host_permissions": [
+    "https://script.google.com/*",
+    "https://script.googleusercontent.com/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Controle de Ponto",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}
