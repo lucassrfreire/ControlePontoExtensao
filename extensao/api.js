@@ -6,6 +6,36 @@ const EM_EXTENSAO = typeof chrome !== 'undefined' && Boolean(chrome.storage && c
 // Carregado no <head>: marca a página antes da primeira pintura para o web.css valer sem "pulo" de layout.
 if (!EM_EXTENSAO) document.documentElement.classList.add('web');
 
+// Aparência: 'auto' (segue o sistema), 'claro' ou 'escuro'. Fica no localStorage para ser lida
+// de forma síncrona e aplicada antes da primeira pintura (sem piscar).
+const CHAVE_TEMA = 'tema';
+
+function lerTema() {
+  try {
+    return localStorage.getItem(CHAVE_TEMA) || 'auto';
+  } catch (err) {
+    return 'auto';
+  }
+}
+
+function aplicarTema(tema) {
+  const raiz = document.documentElement;
+  if (tema === 'claro') raiz.dataset.theme = 'light';
+  else if (tema === 'escuro') raiz.dataset.theme = 'dark';
+  else delete raiz.dataset.theme;
+}
+
+function salvarTema(tema) {
+  try {
+    localStorage.setItem(CHAVE_TEMA, tema);
+  } catch (err) {
+    // Sem armazenamento disponível: vale só até fechar a página.
+  }
+  aplicarTema(tema);
+}
+
+aplicarTema(lerTema());
+
 const URL_PWA = 'https://lucassrfreire.github.io/ControlePontoExtensao/extensao/popup.html';
 const CHAVE_STORAGE_URL = 'webAppUrl';
 

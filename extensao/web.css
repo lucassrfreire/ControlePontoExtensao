@@ -1,7 +1,7 @@
 /* Estilos só da versão web/PWA (celular). Na extensão <html> não recebe a classe "web", então nada aqui vale. */
 
 html.web {
-  background: var(--dark);
+  background: var(--bg);
   -webkit-text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent;
 }
@@ -12,27 +12,91 @@ html.web body {
   margin: 0 auto;
   min-height: 100vh;
   min-height: 100dvh;
-  display: flex;
-  flex-direction: column;
   padding-left: env(safe-area-inset-left);
   padding-right: env(safe-area-inset-right);
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
-html.web .app-header {
-  padding-top: calc(env(safe-area-inset-top) + 12px);
-  padding-bottom: 22px;
+html.web .topbar {
+  padding: calc(env(safe-area-inset-top) + 16px) 20px 10px;
+}
+
+html.web .topbar h1 {
+  font-size: 28px;
+}
+
+html.web .topbar-date {
+  font-size: 14px;
+}
+
+html.web .icon-button {
+  width: 42px;
+  height: 42px;
 }
 
 html.web .content {
-  flex: 1;
-  padding-bottom: calc(env(safe-area-inset-bottom) + 14px);
+  padding: 0 14px 20px;
+}
+
+html.web .card {
+  padding: 16px;
+}
+
+html.web .manual-card {
+  padding: 0;
+}
+
+html.web .hero {
+  padding: 18px;
+  gap: 18px;
+}
+
+html.web .ring,
+html.web .ring svg {
+  width: 132px;
+  height: 132px;
+}
+
+html.web .worked {
+  font-size: 30px;
+}
+
+html.web .balance-value {
+  font-size: 34px;
+}
+
+html.web .step {
+  --dot: 36px;
+}
+
+html.web .step-label {
+  font-size: 11.5px;
+}
+
+html.web .step-time {
+  font-size: 14px;
+}
+
+html.web .cta {
+  padding: 15px 14px;
+  font-size: 16px;
+  border-radius: 16px;
+}
+
+html.web .disclosure {
+  padding: 16px;
+  font-size: 15px;
+}
+
+html.web .manual-panel {
+  padding: 0 16px 16px;
 }
 
 /* Abaixo de 16px o iOS dá zoom ao focar o campo. */
 html.web input,
 html.web select {
   font-size: 16px;
-  padding: 9px 10px;
+  padding: 11px 12px;
 }
 
 html.web button {
@@ -47,24 +111,11 @@ html.web .manual-grid > div:last-child {
   grid-column: 1 / -1;
 }
 
-html.web .quick-button {
-  min-height: 54px;
-}
-
-html.web .icon-button {
-  width: 40px;
-  height: 40px;
-}
-
 html.web .primary-button.full {
-  padding: 13px 12px;
-  font-size: 15px;
-}
-
-html.web .saldo-value {
-  font-size: 38px;
+  padding: 14px 12px;
+  font-size: 16px;
 }
 
 html.web .status {
-  bottom: calc(env(safe-area-inset-bottom) + 14px);
+  bottom: calc(env(safe-area-inset-bottom) + 16px);
 }

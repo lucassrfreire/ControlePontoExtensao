@@ -7,15 +7,17 @@ Extensão do Chrome e app para iPhone para registrar o ponto do dia e acompanhar
   &nbsp;
   <img src="docs/prints/popup-dia-completo.png" width="270" alt="Popup mostrando um dia completo lançado manualmente" />
   &nbsp;
-  <img src="docs/prints/popup-chrome.png" width="270" alt="Popup aberto na barra do Chrome com saldo negativo" />
+  <img src="docs/prints/popup-tema-escuro.png" width="270" alt="Popup no tema escuro" />
 </p>
 
 ## Funcionalidades
 
+- **Progresso do dia:** um anel mostra o quanto você já trabalhou em relação à meta, contando ao vivo, e um selo diz quanto falta ("Faltam 4:18", em vermelho) ou quanto passou ("Meta cumprida · +0:40", em verde).
 - **Saldo acumulado** do banco de horas em destaque: verde quando há horas de sobra, vermelho quando há horas devendo.
-- **Registrar agora:** um clique registra Entrada, Saída Almoço, Volta Almoço ou Saída com o horário atual. O próximo registro esperado do dia fica destacado.
-- **Lançamento manual:** escolha dia, horário e tipo para corrigir ou lançar um ponto esquecido. Pede confirmação antes de substituir um horário que já existe e não aceita datas futuras.
-- **Registros do dia:** mostra os 4 horários da data selecionada, o total trabalhado (contando ao vivo enquanto o dia está em andamento) e o saldo do dia quando está completo.
+- **Registrar agora:** um botão grande registra o próximo horário esperado do dia (Entrada, Saída Almoço, Volta Almoço ou Saída) com a hora atual. Tocar em qualquer horário da linha do tempo registra aquele tipo.
+- **Lançamento manual:** abre ao tocar na seção. Escolha dia, horário e tipo para corrigir ou lançar um ponto esquecido. Pede confirmação antes de substituir um horário que já existe e não aceita datas futuras.
+- **Linha do tempo do dia:** mostra os 4 horários da data selecionada e o saldo do dia quando está completo.
+- **Tema claro e escuro:** por padrão acompanha o tema do navegador ou do iPhone (Automático). Em ⚙ Configurações você pode forçar Claro ou Escuro, e a escolha fica salva no aparelho.
 - **Planilha sempre coerente:** dias lançados fora de ordem entram na posição cronológica correta, e editar um horário direto na planilha recalcula os totais automaticamente.
 - **No iPhone:** a mesma tela, instalável na Tela de Início como um app (PWA).
 - **Registro por localização:** o app Atalhos do iPhone pergunta se pode registrar o ponto quando você chega ou sai da empresa.
