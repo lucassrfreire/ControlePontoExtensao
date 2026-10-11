@@ -100,8 +100,21 @@ Sem esse passo a extensão mostra "Resposta inesperada do Apps Script".
 
 Dias lançados fora de ordem (ex: um dia antigo esquecido) são inseridos na posição cronológica correta da planilha, para o Saldo Acumulado continuar coerente.
 
+## 8. iPhone
+
+O iPhone usa a mesma tela da extensão (instalada na Tela de Início) e, opcionalmente, o app Atalhos para registrar por localização.
+
+1. **Nova versão do Apps Script.** O `Code.gs` atual aceita `tipo=auto` e devolve o campo `mensagem`. Publique em *Implantar → Gerenciar implantações → editar → Nova versão*. Confira também o fuso em *Configurações do projeto* (`America/Sao_Paulo`).
+2. **Ativar o GitHub Pages.** No repositório, *Settings → Pages → Deploy from a branch → `main` → `/ (root)`. O app fica em `https://lucassrfreire.github.io/ControlePontoExtensao/extensao/popup.html` depois de cerca de 1 minuto.
+3. **Instalar no iPhone.** Na extensão do Chrome, ⚙ → **Copiar link para configurar o celular**. Envie o link para você mesmo, abra no Safari e use *Compartilhar → Adicionar à Tela de Início*. Se o app instalado pedir a URL, cole-a em ⚙.
+4. **Registro por localização (opcional).** Siga [docs/atalhos-iphone.md](docs/atalhos-iphone.md).
+
+O link de configuração e o atalho contêm a URL do Web App, que funciona como senha. Não os compartilhe.
+
 ## Se algo der errado
 
+- **App do iPhone abre pedindo a URL do Web App:** o iOS guarda os dados do app instalado separados dos do Safari. Abra ⚙ no app e cole a URL (uma vez só).
+- **App do iPhone não carrega dados ou mostra erro de rede:** confira se o acesso da implantação está como "Qualquer pessoa" e se o link do Pages abre no Safari.
 - **Extensão mostra "Resposta inesperada do Apps Script":** o Apps Script não foi reimplantado como nova versão (seção 7) ou o acesso da implantação não está como "Qualquer pessoa".
 - **Nada acontece ao clicar:** confira se `WEB_APP_URL` foi preenchida corretamente em `config.js` (sem espaços extras, com `/exec` no final).
 - **Erro de permissão:** repita o passo 2, item 9 — o script precisa de autorização da sua conta Google na primeira implantação (ou na primeira execução manual de uma função nova, como `configurarTotalizador`).

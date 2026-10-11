@@ -10,6 +10,10 @@
  * Endpoints do Web App:
  * - GET  ?data=yyyy-MM-dd                  -> JSON com saldo acumulado e registros do dia
  * - POST data, tipo, hora (HH:mm opcional) -> registra o ponto e devolve o mesmo JSON do GET
+ * - POST tipo=auto (data opcional)         -> registra no próximo horário vazio do dia
+ *                                             (usado pelo app Atalhos do iPhone)
+ *
+ * Toda resposta do POST traz "mensagem", um texto pronto para exibir em notificação.
  *
  * Sempre que alterar este arquivo, publique uma nova versão em
  * Implantar > Gerenciar implantações (veja SETUP.md).
@@ -27,6 +31,18 @@ const COLUNAS = {
   saida: 5
 };
 
+const ORDEM_TIPOS = ['entrada', 'saida_almoco', 'volta_almoco', 'saida'];
+const NOMES_TIPOS = {
+  entrada: 'Entrada',
+  saida_almoco: 'Saída Almoço',
+  volta_almoco: 'Volta Almoço',
+  saida: 'Saída'
+};
+
+// Registros automáticos (tipo=auto) a menos desse tempo do último horário do dia são
+// ignorados, para um gatilho de localização disparado duas vezes não preencher o horário seguinte.
+const AUTO_INTERVALO_MIN = 10;
+
 const REGEX_DATA = /^\d{4}-\d{2}-\d{2}$/;
 const REGEX_HORA = /^([01]\d|2[0-3]):[0-5]\d$/;
 
@@ -41,27 +57,47 @@ function doPost(e) {
   lock.waitLock(10000);
   try {
     const sheet = getSheet_();
-    const data = (e.parameter.data || '').trim();
-    const tipo = (e.parameter.tipo || '').trim();
+    const tipoPedido = (e.parameter.tipo || '').trim();
+    const auto = tipoPedido === 'auto';
+    const data = (e.parameter.data || '').trim() || (auto ? hoje_() : '');
     const horaManual = (e.parameter.hora || '').trim();
 
-    if (!REGEX_DATA.test(data) || !COLUNAS[tipo]) {
-      return json_({ ok: false, erro: 'Parâmetros inválidos: data ou tipo ausente/desconhecido.' });
+    if (!REGEX_DATA.test(data) || !(auto || COLUNAS[tipoPedido])) {
+      return erro_('Parâmetros inválidos: data ou tipo ausente/desconhecido.');
     }
     if (horaManual && !REGEX_HORA.test(horaManual)) {
-      return json_({ ok: false, erro: 'Horário inválido. Use o formato HH:mm.' });
+      return erro_('Horário inválido. Use o formato HH:mm.');
     }
 
-    const hora = horaManual
-      ? horaManual + ':00'
-      : Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'HH:mm:ss');
+    const horaAtual = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'HH:mm:ss');
+    const hora = horaManual ? horaManual + ':00' : horaAtual;
+    let tipo = tipoPedido;
+
+    if (auto) {
+      const resumoAtual = montarResumo_(sheet, data);
+      tipo = resolverTipoAuto_(resumoAtual.dia);
+      if (!tipo) {
+        return erro_('O dia ' + data + ' já tem os 4 registros.');
+      }
+      if (data === hoje_() && deveIgnorarAuto_(resumoAtual.dia, paraMinutos_(hhmm_(horaAtual)), AUTO_INTERVALO_MIN)) {
+        resumoAtual.ok = true;
+        resumoAtual.ignorado = true;
+        resumoAtual.mensagem = 'Ignorado: já houve um registro há menos de ' + AUTO_INTERVALO_MIN + ' min.';
+        return json_(resumoAtual);
+      }
+    }
+
     const linha = encontrarOuCriarLinha_(sheet, data);
 
     sheet.getRange(linha, COLUNAS[tipo]).setValue(hora);
     recalcularTotais_(sheet, 2);
     SpreadsheetApp.flush();
 
-    return json_(montarResumo_(sheet, data));
+    const resumo = montarResumo_(sheet, data);
+    resumo.tipo = tipo;
+    resumo.mensagem = NOMES_TIPOS[tipo] + ' registrada às ' + hhmm_(hora) +
+      ' (' + data + ') · saldo ' + formatarSaldoMin_(resumo.saldoAcumuladoMin);
+    return json_(resumo);
   } finally {
     lock.releaseLock();
   }
@@ -243,6 +279,43 @@ function hoje_() {
 
 function json_(obj) {
   return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
+}
+
+function erro_(texto) {
+  return json_({ ok: false, erro: texto, mensagem: texto });
+}
+
+// Próximo horário vazio do dia na ordem entrada → saída almoço → volta almoço → saída.
+// `dia` usa o formato do resumo ({ entrada: 'HH:mm' | '', ... }). Devolve null se o dia está completo.
+function resolverTipoAuto_(dia) {
+  for (let i = 0; i < ORDEM_TIPOS.length; i++) {
+    if (!dia[ORDEM_TIPOS[i]]) return ORDEM_TIPOS[i];
+  }
+  return null;
+}
+
+// True se o último horário do dia foi registrado há menos de `intervaloMin` minutos.
+function deveIgnorarAuto_(dia, agoraMin, intervaloMin) {
+  let ultimo = null;
+  for (let i = 0; i < ORDEM_TIPOS.length; i++) {
+    const horario = dia[ORDEM_TIPOS[i]];
+    if (!horario) continue;
+    const minutos = paraMinutos_(horario);
+    if (ultimo === null || minutos > ultimo) ultimo = minutos;
+  }
+  if (ultimo === null) return false;
+  const decorrido = agoraMin - ultimo;
+  return decorrido >= 0 && decorrido < intervaloMin;
+}
+
+function paraMinutos_(hhmm) {
+  const partes = String(hhmm).split(':');
+  return Number(partes[0]) * 60 + Number(partes[1]);
+}
+
+function formatarSaldoMin_(minutos) {
+  const abs = Math.abs(minutos);
+  return (minutos < 0 ? '-' : '+') + Math.floor(abs / 60) + ':' + ('0' + (abs % 60)).slice(-2);
 }
 
 function ehHorario_(valor) {

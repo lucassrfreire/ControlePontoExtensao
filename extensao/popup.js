@@ -2,8 +2,10 @@ let webAppUrl = '';
 let hoje = '';
 let diaHoje = null;
 let diaSelecionado = null;
+let metaMin = null;
 let ocupado = false;
 let statusTimer = null;
+let horarioEditado = false;
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const ICONES = {
@@ -19,6 +21,7 @@ const settingsEl = document.getElementById('settings');
 const urlInput = document.getElementById('url-input');
 const settingsSave = document.getElementById('settings-save');
 const settingsCancel = document.getElementById('settings-cancel');
+const copyLinkButton = document.getElementById('copy-link');
 const saldoCard = document.querySelector('.saldo-card');
 const saldoValue = document.getElementById('saldo-value');
 const saldoHint = document.getElementById('saldo-hint');
@@ -59,12 +62,31 @@ async function init() {
   settingsCancel.addEventListener('click', fecharConfiguracoes);
   settingsSave.addEventListener('click', salvarConfiguracoes);
   manualDate.addEventListener('change', onTrocarDia);
+  manualTime.addEventListener('input', () => { horarioEditado = true; });
   manualSubmit.addEventListener('click', onLancamentoManual);
+
+  // O link de configuração do celular só faz sentido gerar a partir da extensão.
+  copyLinkButton.hidden = !EM_EXTENSAO;
+  copyLinkButton.addEventListener('click', copiarLinkCelular);
+
+  // Na PWA a página fica aberta em segundo plano: ao voltar, atualiza o dia e os dados.
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) aoVoltarParaApp();
+  });
+  window.addEventListener('pageshow', (event) => {
+    if (event.persisted) aoVoltarParaApp();
+  });
 
   renderQuick();
   renderDia();
 
   webAppUrl = await getWebAppUrl();
+  const urlDoLink = lerUrlDoLink();
+  const configuradoPeloLink = Boolean(urlDoLink) && urlDoLink !== webAppUrl;
+  if (configuradoPeloLink) {
+    webAppUrl = urlDoLink;
+    await setWebAppUrl(urlDoLink);
+  }
   if (!webAppUrl) {
     saldoHint.textContent = 'Configure a URL do Web App para começar.';
     abrirConfiguracoes();
@@ -72,6 +94,40 @@ async function init() {
     return;
   }
   carregar();
+  if (configuradoPeloLink) mostrarStatus('URL do Web App configurada pelo link.');
+}
+
+function aoVoltarParaApp() {
+  const hojeAgora = dataLocalISO(new Date());
+  if (hojeAgora !== hoje) {
+    const acompanhavaHoje = manualDate.value === hoje;
+    hoje = hojeAgora;
+    todayDate.textContent = formatarData(hoje);
+    manualDate.max = hoje;
+    diaHoje = null;
+    if (acompanhavaHoje) {
+      manualDate.value = hoje;
+      diaSelecionado = null;
+    }
+    renderQuick();
+    renderDia();
+  }
+  if (!horarioEditado) manualTime.value = horaLocal(new Date());
+  atualizarRelogio();
+  carregar();
+}
+
+async function copiarLinkCelular() {
+  if (!webAppUrl) {
+    mostrarStatus('Salve a URL do Web App antes de copiar o link.', true);
+    return;
+  }
+  try {
+    await navigator.clipboard.writeText(montarLinkCelular(webAppUrl));
+    mostrarStatus('Link copiado! Envie para você mesmo e abra no iPhone.');
+  } catch (err) {
+    mostrarStatus('Não foi possível copiar o link.', true);
+  }
 }
 
 // --- Carregamento ---
@@ -113,6 +169,7 @@ async function onTrocarDia() {
 }
 
 function aplicarResumo(resumo) {
+  metaMin = resumo.metaMin;
   renderSaldo(resumo);
 
   if (resumo.dia.data === hoje) {
@@ -167,6 +224,7 @@ async function registrar(data, tipo, hora) {
   try {
     const resumo = await registrarPonto(webAppUrl, data, tipo.id, hora);
     aplicarResumo(resumo);
+    horarioEditado = false;
     mostrarStatus(`${tipo.label} registrada às ${resumo.dia[tipo.id]} (${formatarData(data)}).`);
   } catch (err) {
     mostrarStatus(err.message, true);
@@ -260,6 +318,10 @@ function renderDia() {
   dayTotal.hidden = trabalhado === null;
   if (trabalhado !== null) {
     dayTotal.textContent = `Total trabalhado: ${formatarDuracao(trabalhado)}`;
+    dayTotal.removeAttribute('title');
+    if (metaMin !== null) {
+      dayTotal.appendChild(criarDiferencaMeta(trabalhado - metaMin));
+    }
   }
 
   if (dia && dia.saldoDiaMin !== null) {
@@ -290,6 +352,18 @@ function minutosTrabalhados(dia) {
     }
   });
   return total;
+}
+
+// Negativo = quanto falta para cumprir a meta do dia; positivo = quanto passou dela.
+function criarDiferencaMeta(diferenca) {
+  const falta = diferenca < 0;
+  const span = document.createElement('span');
+  span.className = `meta-diff ${falta ? 'negativo' : 'positivo'}`;
+  span.textContent = ` (${falta ? '-' : ''}${formatarDuracao(diferenca)})`;
+  dayTotal.title = falta
+    ? `Faltam ${formatarDuracao(diferenca)} para a meta de ${formatarDuracao(metaMin)}`
+    : `Meta de ${formatarDuracao(metaMin)} cumprida`;
+  return span;
 }
 
 function criarIcone(tipoId) {

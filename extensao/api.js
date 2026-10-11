@@ -1,4 +1,13 @@
-// Configuração (chrome.storage.local) e chamadas ao Web App do Apps Script.
+// Configuração e chamadas ao Web App do Apps Script.
+// Roda como extensão do Chrome (chrome.storage.local) e como página/PWA no celular (localStorage).
+
+const EM_EXTENSAO = typeof chrome !== 'undefined' && Boolean(chrome.storage && chrome.storage.local);
+
+// Carregado no <head>: marca a página antes da primeira pintura para o web.css valer sem "pulo" de layout.
+if (!EM_EXTENSAO) document.documentElement.classList.add('web');
+
+const URL_PWA = 'https://lucassrfreire.github.io/ControlePontoExtensao/extensao/popup.html';
+const CHAVE_STORAGE_URL = 'webAppUrl';
 
 const TIPOS = [
   { id: 'entrada', label: 'Entrada' },
@@ -10,16 +19,41 @@ const TIPOS = [
 const PREFIXO_URL_WEB_APP = 'https://script.google.com/';
 
 async function getWebAppUrl() {
-  const { webAppUrl } = await chrome.storage.local.get({ webAppUrl: '' });
-  return webAppUrl;
+  if (EM_EXTENSAO) {
+    const { webAppUrl } = await chrome.storage.local.get({ [CHAVE_STORAGE_URL]: '' });
+    return webAppUrl;
+  }
+  try {
+    return localStorage.getItem(CHAVE_STORAGE_URL) || '';
+  } catch (err) {
+    return '';
+  }
 }
 
 async function setWebAppUrl(url) {
-  await chrome.storage.local.set({ webAppUrl: url });
+  if (EM_EXTENSAO) {
+    await chrome.storage.local.set({ [CHAVE_STORAGE_URL]: url });
+    return;
+  }
+  try {
+    localStorage.setItem(CHAVE_STORAGE_URL, url);
+  } catch (err) {
+    // Navegação privada: a URL vale só até fechar a página.
+  }
 }
 
 function isWebAppUrlValida(url) {
   return url.startsWith(PREFIXO_URL_WEB_APP) && url.endsWith('/exec');
+}
+
+// A URL do Web App vai no fragmento (#), que o navegador nunca envia a servidores.
+function montarLinkCelular(url) {
+  return `${URL_PWA}#u=${encodeURIComponent(url)}`;
+}
+
+function lerUrlDoLink() {
+  const valor = new URLSearchParams(location.hash.replace(/^#/, '')).get('u') || '';
+  return isWebAppUrlValida(valor) ? valor : '';
 }
 
 async function buscarResumo(url, data) {

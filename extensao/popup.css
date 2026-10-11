@@ -157,6 +157,18 @@ h2 {
   font-variant-numeric: tabular-nums;
 }
 
+.meta-diff {
+  font-weight: 700;
+}
+
+.meta-diff.negativo {
+  color: var(--red);
+}
+
+.meta-diff.positivo {
+  color: var(--green-strong);
+}
+
 /* Saldo */
 .saldo-card {
   position: relative;
@@ -416,6 +428,27 @@ select:focus {
 
 .secondary-button:hover {
   background: var(--surface);
+}
+
+.link-button {
+  display: block;
+  margin: 8px 0 0;
+  padding: 0;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 11.5px;
+  font-family: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.link-button:hover {
+  color: var(--text-main);
+}
+
+.link-button[hidden] {
+  display: none;
 }
 
 /* Registros do dia */

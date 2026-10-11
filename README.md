@@ -1,6 +1,6 @@
 # Controle de Ponto
 
-Extensão do Chrome para registrar o ponto do dia e acompanhar o banco de horas, usando uma planilha do Google Sheets como base de dados. Feita para uso pessoal: sem servidor, sem login, sem custo.
+Extensão do Chrome e app para iPhone para registrar o ponto do dia e acompanhar o banco de horas, usando uma planilha do Google Sheets como base de dados. Feita para uso pessoal: sem servidor, sem login, sem custo.
 
 <p align="center">
   <img src="docs/prints/popup-saldo-positivo.png" width="270" alt="Popup com saldo positivo e dia em andamento" />
@@ -17,16 +17,21 @@ Extensão do Chrome para registrar o ponto do dia e acompanhar o banco de horas,
 - **Lançamento manual:** escolha dia, horário e tipo para corrigir ou lançar um ponto esquecido. Pede confirmação antes de substituir um horário que já existe e não aceita datas futuras.
 - **Registros do dia:** mostra os 4 horários da data selecionada, o total trabalhado (contando ao vivo enquanto o dia está em andamento) e o saldo do dia quando está completo.
 - **Planilha sempre coerente:** dias lançados fora de ordem entram na posição cronológica correta, e editar um horário direto na planilha recalcula os totais automaticamente.
+- **No iPhone:** a mesma tela, instalável na Tela de Início como um app (PWA).
+- **Registro por localização:** o app Atalhos do iPhone pergunta se pode registrar o ponto quando você chega ou sai da empresa.
 
 ## Como funciona
 
 ```
-Extensão do Chrome ──GET/POST──▶ Google Apps Script (Web App) ──▶ Google Sheets
-   (popup)                          Code.gs                         aba "Ponto"
+Extensão do Chrome ─┐
+App no iPhone (PWA) ─┼─GET/POST─▶ Google Apps Script (Web App) ──▶ Google Sheets
+Atalhos do iPhone ──┘             Code.gs                         aba "Ponto"
 ```
 
 - O **Apps Script** (`Code.gs`) fica vinculado à planilha e é publicado como Web App. Ele grava os horários, calcula os totais e devolve um resumo em JSON.
 - A **extensão** (`extensao/`) consome esse Web App. A URL dele é configurada no próprio popup e fica salva no `chrome.storage`.
+- O **app do iPhone** é a mesma tela da extensão (`extensao/popup.html`) publicada no GitHub Pages. Fora da extensão ela usa `localStorage` no lugar do `chrome.storage`.
+- O **Atalhos** chama o Web App com `tipo=auto`, e o script grava no próximo horário vazio do dia.
 - O **`index.html`** é uma alternativa mais simples, sem extensão: uma página com os 4 botões que só registra o ponto.
 
 ### Estrutura da planilha
@@ -53,26 +58,58 @@ Para usar o `index.html` em vez da extensão, copie `config.example.js` para `co
 
 > Sempre que alterar o `Code.gs`, publique uma **nova versão** em *Implantar → Gerenciar implantações*. A URL continua a mesma.
 
+## Uso no iPhone
+
+<p align="center">
+  <img src="docs/prints/celular-iphone.png" width="300" alt="Tela do app no iPhone com saldo positivo e dia em andamento" />
+</p>
+
+O app é a própria tela da extensão, servida pelo **GitHub Pages**, e se instala na Tela de Início sem App Store.
+
+**Uma vez, no repositório:** em *Settings → Pages*, escolha *Deploy from a branch*, branch `main`, pasta `/ (root)`. Em cerca de 1 minuto o app fica em:
+
+```
+https://lucassrfreire.github.io/ControlePontoExtensao/extensao/popup.html
+```
+
+**Para instalar:**
+
+1. Na extensão do Chrome, abra ⚙ **Configurações** e toque em **Copiar link para configurar o celular**.
+2. Envie o link para você mesmo (WhatsApp, Notas, e-mail) e abra-o no **Safari** do iPhone. A URL do Web App viaja no fragmento (`#u=…`) do link, que o navegador nunca envia a servidores.
+3. Toque em **Compartilhar → Adicionar à Tela de Início**.
+4. Abra pelo ícone. Se o app pedir a URL do Web App, abra ⚙ e cole-a (acontece uma vez, caso o iOS abra o app instalado sem a configuração do Safari).
+
+Use sempre o app instalado: o Safari comum pode apagar dados de sites sem uso depois de alguns dias, e o app da Tela de Início não sofre isso.
+
+### Registro automático por localização
+
+O app **Atalhos** do iPhone pode perguntar "registrar o ponto?" quando você chega ou sai da empresa, e gravar no próximo horário vazio do dia. O passo a passo está em [docs/atalhos-iphone.md](docs/atalhos-iphone.md).
+
 ## Estrutura do repositório
 
 ```
-├── Code.gs              # Apps Script: grava pontos, calcula totais e expõe o Web App
-├── extensao/            # Extensão do Chrome (Manifest V3)
-│   ├── manifest.json
+├── Code.gs                  # Apps Script: grava pontos, calcula totais e expõe o Web App
+├── extensao/                # Extensão do Chrome (Manifest V3) e app web do iPhone (PWA)
+│   ├── manifest.json        # Manifesto da extensão
+│   ├── manifest.webmanifest # Manifesto da PWA
 │   ├── popup.html / popup.css / popup.js
-│   ├── api.js           # Configuração e chamadas ao Web App
+│   ├── web.css              # Estilos só da versão web (celular)
+│   ├── api.js               # Configuração e chamadas ao Web App
 │   └── icons/
-├── index.html           # Alternativa simples sem extensão
-├── config.example.js    # Modelo de configuração do index.html
-├── docs/prints/         # Imagens deste README
-└── SETUP.md             # Guia completo de configuração
+├── index.html               # Alternativa simples sem extensão
+├── config.example.js        # Modelo de configuração do index.html
+├── docs/
+│   ├── atalhos-iphone.md    # Registro por localização com o app Atalhos
+│   └── prints/              # Imagens deste README
+└── SETUP.md                 # Guia completo de configuração
 ```
 
 ## Segurança
 
-A URL do Web App funciona como uma senha: quem tiver a URL consegue ler e gravar registros na planilha. Por isso ela não é versionada: o `config.js` está no `.gitignore` e a extensão guarda a URL só no navegador. Não compartilhe essa URL.
+A URL do Web App funciona como uma senha: quem tiver a URL consegue ler e gravar registros na planilha. Por isso ela não é versionada: o `config.js` está no `.gitignore`, a extensão guarda a URL só no navegador e o app do iPhone a guarda só no aparelho. O link de configuração do celular e o atalho do iPhone **contêm essa URL**, então não os compartilhe.
 
 ## Tecnologias
 
 - Google Apps Script + Google Sheets
-- Extensão Chrome Manifest V3 em JavaScript puro (sem dependências nem build)
+- Extensão Chrome Manifest V3 e PWA em JavaScript puro (sem dependências nem build)
+- GitHub Pages (hospedagem do app web) e app Atalhos do iOS (localização)

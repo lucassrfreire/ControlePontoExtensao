@@ -2,8 +2,18 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Controle de Ponto</title>
+  <meta name="theme-color" content="#2f3237" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Ponto" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
   <link rel="stylesheet" href="popup.css" />
+  <link rel="stylesheet" href="web.css" />
+  <script src="api.js"></script>
 </head>
 <body>
   <header class="app-header">
@@ -31,6 +41,7 @@
       <h2>Configurações</h2>
       <label for="url-input">URL do Web App (Apps Script)</label>
       <input id="url-input" type="url" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off" />
+      <button id="copy-link" class="link-button" type="button" hidden>Copiar link para configurar o celular</button>
       <div class="form-actions">
         <button id="settings-cancel" class="secondary-button" type="button">Cancelar</button>
         <button id="settings-save" class="primary-button" type="button">Salvar</button>
@@ -92,7 +103,6 @@
     <div id="status" class="status" hidden></div>
   </main>
 
-  <script src="api.js"></script>
   <script src="popup.js"></script>
 </body>
 </html>
